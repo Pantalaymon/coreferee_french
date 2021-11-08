@@ -55,13 +55,13 @@ vocative        |        vocative
 xcomp   |        open clausal complement
 '''
 
-DEBUG_PHRASE =  'Quelqu\'un est arrivé hier. Il dort dans la chambre.'
+DEBUG_PHRASE =  'Voici ma maison. Je vis ici'
         
 class LanguageSpecificRulesAnalyzer(RulesAnalyzer):
 
     random_word = 'albatros'
 
-    dependent_sibling_deps = ('conj','appos',)
+    dependent_sibling_deps = ('conj',)
 
     conjunction_deps =  ('cd', 'cc', 'punct')
 
@@ -70,14 +70,17 @@ class LanguageSpecificRulesAnalyzer(RulesAnalyzer):
     or_lemmas = ('ou')
 
     entity_noun_dictionary = {
-        'PER': ['personne', 'homme', 'femme','garçon','fille', 'individu'],
-        'LOC': ["lieu","endroit","terrain","secteur","ville"],
-        'ORG': ['entreprise','société','organisation','association','fédération']
+        'PER': ['personne', 'homme', 'femme','garçon','fille', 'individu',"type","gars"],
+        'LOC': ["lieu","endroit","terrain","secteur","ville","village","zone","site","pays"],
+        'ORG': ['entreprise','société','organisation','association','fédération','compagnie',
+                'organisme','établissement','institution',"communauté",'groupe','groupement']
     }
 
     quote_tuples = [("'", "'"), ('"', '"'), ('«', '»'), ('‹', '›'), ('‘', '’'), ('“', '”')]
 
     term_operator_pos = ('DET', 'ADJ')
+    
+    term_operator_dep = ('det','amod','nmod','nummod')
 
     clause_root_pos = ('VERB', 'AUX')
 
@@ -114,8 +117,9 @@ class LanguageSpecificRulesAnalyzer(RulesAnalyzer):
             pass
         elif self.is_quelqun_head(token):
             pass
-        elif token.pos_ not in self.noun_pos + ('ADJ',) or token.dep_ in ('fixed','flat:name',"flat:foreign",'amod') or \
-           (token.dep_ == 'ADJ' and not any([child for child in token.children if child.pos_ == 'DET' or child.dep_ == 'det'])):
+        elif token.pos_ not in self.noun_pos + ('ADJ','PRON') or \
+            token.dep_ in ('fixed','flat:name',"flat:foreign",'amod') or \
+           (token.pos_ in ('ADJ','PRON') and not any([child for child in token.children if child.dep_ == 'det'])):
             return False
         return not self.is_token_in_one_of_phrases(token, self.blacklisted_phrases)
         
@@ -215,8 +219,9 @@ class LanguageSpecificRulesAnalyzer(RulesAnalyzer):
         
         def refers_to_person(token):
             if (token.pos_ == self.propn_pos and token.lemma_ in self.male_names+self.female_names) or \
-                working_token.ent_type_ == 'PER' or working_token.lemma_ in self.person_words or \
-                self.is_quelqun_head(token):
+                token.ent_type_ == 'PER' or self.is_quelqun_head(token) or \
+                token.lemma_ in self.entity_noun_dictionary['PER']:#or token.lemma_ in self.person_words \
+                
                 return True
             if token.dep_ in ('nsubj', 'nsubj:pass') and \
                 token.head.lemma_ in self.verbs_with_personal_subject:
@@ -297,12 +302,14 @@ class LanguageSpecificRulesAnalyzer(RulesAnalyzer):
             
         doc = referring.doc
         referred_root = doc[referred.root_index]
+        uncertain = False
         #DEBUG_PHRASE =  'Pierre et Marie les voyaient lui et elle.'
         referring_masc, referring_fem, referring_sing, referring_plur = get_gender_number_info(referring)
         if doc.text == DEBUG_PHRASE:
             print("DEBUG alpha:",[referred_root,referred.token_indexes,'|',referring, \
                 self.is_potential_reflexive_pair(referred, referring), self.is_reflexive_anaphor(referring) ])
         if self.is_quelqun_head(referred_root) and referred.root_index > referring.i:
+            #qqn can't be cataphoric
             return 0
         # e.g. 'les hommes et les femmes' ... 'ils': 'ils' cannot refer only to
         # 'les hommes' or 'les femmes'
@@ -359,18 +366,18 @@ class LanguageSpecificRulesAnalyzer(RulesAnalyzer):
             return 0
 
         #'ici , là... cannot refer to person. only loc and  possibly orgs
-        if self.is_potential_anaphor(referring) and referring.lemma_ in ('ici','là','y'):
-            for working_token in (doc[index] for index in referred.token_indexes):
-                if refers_to_person(working_token) or working_token.lemma_ in self.animal_names:
-                    if doc.text == DEBUG_PHRASE:
-                        print("DEBUG 6:",[referred_root,referred_plur, referred_sing ,'|', referring_plur, referring_sing])
-       
-                    return 0
-                if working_token.ent_type_ in ('ORG') and referring.lemma_ != 'y':
-                    if doc.text == DEBUG_PHRASE:
-                        print("DEBUG 7:",[referred_root,referred_plur, referred_sing ,'|', referring_plur, referring_sing])
-       
-                    return 1
+        #y needs more conditions
+        if self.is_potential_anaphor(referring) and referring.lemma_ in ('ici','là',"y"):
+            if refers_to_person(referred_root):# or working_token.lemma_ in self.animal_names:
+                if doc.text == DEBUG_PHRASE:
+                    print("DEBUG 6:",[referred_root,referred_plur, referred_sing ,'|', referring, referring_plur, referring_sing])
+   
+                return 0
+            if referred_root.ent_type_ == 'ORG' and referring.lemma_ != 'y':
+                if doc.text == DEBUG_PHRASE:
+                    print("DEBUG 7:",[referred_root,referred_plur, referred_sing ,'|', referring, referring_plur, referring_sing])
+   
+                uncertain = True
 
         
         if directly:
@@ -422,7 +429,12 @@ class LanguageSpecificRulesAnalyzer(RulesAnalyzer):
                     #doc shorter than the compared index
                     pass
                 if referring.lemma_ == 'en':
-                    #requires list of massive/countable nouns to be implemented
+                    #requires list of mass/countable nouns to be implemented
+                    '''
+                    if  not referred_plur and referred_root.lemma_ not in self.mass_nouns
+                        and referring.dep_ != 'iobj':
+                        return 0
+                    '''
                     pass
             if self.is_potential_reflexive_pair(referred, referring) and \
                     self.is_reflexive_anaphor(referring) == 0:
@@ -452,11 +464,11 @@ class LanguageSpecificRulesAnalyzer(RulesAnalyzer):
             for working_token in (doc[index] for index in referred.token_indexes):
                 if working_token.pos_ == self.propn_pos or working_token.ent_type_ == 'PER':
                     return 2
-            return 1
+            uncertain = True
 
-        return 2
+        return 1 if uncertain else 2
 
-    def has_operator_child_with_morphs(self, token:Token, morphs:dict):
+    def has_operator_child_with_any_morph(self, token:Token, morphs:dict):
         for child in (child for child in token.children if child.pos_ in self.term_operator_pos):
             for morph in morphs:
                 if self.has_morph(child, morph, morphs.get(morph)):
@@ -464,11 +476,11 @@ class LanguageSpecificRulesAnalyzer(RulesAnalyzer):
         return False
 
     def is_potentially_indefinite(self, token:Token) -> bool:
-        return self.has_operator_child_with_morphs(token, {'Definite':'Ind'}) or \
+        return self.has_operator_child_with_any_morph(token, {'Definite':'Ind'}) or \
         self.is_quelqun_head(token)
 
     def is_potentially_definite(self, token:Token) -> bool:
-        return self.has_operator_child_with_morphs(token, {'Definite':'Def',"PronType":"Dem"})
+        return self.has_operator_child_with_any_morph(token, {'Definite':'Def',"PronType":"Dem"})
         
     def is_reflexive_anaphor(self, token:Token) -> int:
         # AJOUTER sa personne
@@ -554,7 +566,7 @@ class LanguageSpecificRulesAnalyzer(RulesAnalyzer):
             Overrides the method of the parent class which is not suitable for be clause in french
         '''
         
-        DEBUG_PHRASE =  "Bien qu'ils s'amusaient, le garçon et la fille partirent."
+        DEBUG_PHRASE =  "Bien qu'ils s'amusaient, le garçon et laa fille partirent."
 
         doc = referring.doc
         referred_root = doc[referred.root_index]
@@ -599,6 +611,19 @@ class LanguageSpecificRulesAnalyzer(RulesAnalyzer):
         #if doc.text == DEBUG_PHRASE: print("DEBUG 103", referring_inclusive_ancestors, referred_verb_ancestors, \
         #    [t for t in referring_inclusive_ancestors if t.pos_ in self.clause_root_pos and t not in referred_verb_ancestors])
         return False
+        
+    def is_potentially_referring_back_noun(self, token:Token) -> bool:
+
+        if self.is_potentially_definite(token) and len([1 for c in token.children if
+                c.pos_ not in self.term_operator_pos and c.dep_ not in self.conjunction_deps
+                and c.dep_ not in self.dependent_sibling_deps and c.dep_ not in self.term_operator_dep]) == 0:
+            return True
+
+        return token._.coref_chains.temp_governing_sibling is not None and len([1 for c in
+                token.children if c.dep_ not in self.conjunction_deps and c.dep_ not in
+                self.dependent_sibling_deps]) == 0 and \
+                self.is_potentially_referring_back_noun(token._.coref_chains.temp_governing_sibling)
+
 '''
 POS=NUM         |        numeral
 POS=ADV         |        adverb
