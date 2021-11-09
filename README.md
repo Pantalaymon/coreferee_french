@@ -11,7 +11,7 @@ Done :
 - Locating a ccorpus annotated with coreference (DEMOCRAT)
 - Making class to load the corpus
 - Trained the three models ('fr_core_news_sm','fr_core_news_md','fr_core_news_lg')
-- Installed de Models
+- Installed the Models
 
 
 
