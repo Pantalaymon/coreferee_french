@@ -1,7 +1,7 @@
 # coreferee_french
 
 
-Adding support for french models on ([coreferee](https://github.com/msg-systems/coreferee), a coreference resolution extensible python 3 library:
+Adding support for french models on [coreferee](https://github.com/msg-systems/coreferee), a coreference resolution extensible python 3 library:
 This repository contains the code and the ressources developped to add support for french in the library. 
 
 ## Road Mad
