@@ -47,12 +47,27 @@ Elements that are typically *not* covered but could potentially corefer in a tex
 - Relative pronouns : ("que", "dont","lesquels",...)
 - Interrogative pronouns : ("quoi","qui",...)
 - 'neuter' demonstrative pronoun and its derivative : Generally Either deictic or refers to proposition, not noun phrase ("ça","cela","c","ce")
+- Dates : years, days, hours, or centuries... 
+- 
 
 ## The Corpus
 
 The Corpus used for the training, the development and the test is [DEMOCRAT](https://www.ortolang.fr/market/corpora/democrat/v1.1)
 It was converted to the CONLL format and split into training, dev and test in [a previous project](https://github.com/Pantalaymon/neuralcoref-for-french) .
+Here are a few facts that ought to be relevant for the training and evaluation and model performance: 
+- The corpus is pretokenised. Some of the token limits don't match with the tokenization made by spacy. This inevitably leads to some badly recognized words and thus coreference errors.
+- The documents in the original corpus are split in documents of 15 sentences for processing reasons (Parsing entire books with spacy takes too much time and memory). Very long coreference chains spanning entire texts are thus not considered. The longer the document, the least likely the coreference chains will be accurate.
+- DEMOCRAT as well as the corpus the spacy pipeline was trained on([Sequoia](http://deep-sequoia.inria.fr/)) are written french corpora. Hence why the models will have a subpar performance on oral data.
+- A mention must have at least one coreferring mention. Which means singletons are not considered in the following table
+
+|             | Number of mentions | Number of covered mentions | Proportion of covered mentions | Number of uncorresponding mention limit due to tokenization |
+| :----------:|       :-:          |           :-:              |           :-:                  |                             :-:                             |
+| Train + Dev |       55921        |           40063            |           15858                |                             59                              |
+| Test        |               |                       |                           |                                                           |
+
 
 
 ## Model Performance
 The results
+
+
