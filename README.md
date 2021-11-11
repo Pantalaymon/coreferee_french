@@ -62,7 +62,7 @@ Here are a few facts that ought to be relevant for the training and evaluation a
 
 |             | Number of mentions | Number of covered mentions | Proportion of covered mentions | Number of uncorresponding mention limit due to tokenization |
 | :----------:|       :-:          |           :-:              |           :-:                  |                             :-:                             |
-| Train + Dev |       55921        |           40063            |           15858                |                             59                              |
+| Train + Dev |       55921        |           40063            |           71.6 %               |                             59                              |
 | Test        |               |                       |                           |                                                           |
 
 
