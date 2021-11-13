@@ -30,7 +30,7 @@ The potential candidates for coreference are divided in two categories , the inp
   - Common Nouns : Whether Definitie or indefinite
   - Substantive adjectives : Adjectived used in noun position ('Le beau','Le petit','L'autre'...)
   - Numerals substracting part of a plural nouns : ('un des garçons', 'trois des filles'...)
-  - third person Possessive pronouns : Refer to an entity different from the marker owner ('Le sien', 'Le leur', ...)
+  - third person Possessive pronouns : Refer to an entity different from the marked owner ('Le sien', 'Le leur', ...)
 
 - Anaphors :
   - Third person personal pronoun : Whether subject, object, or else ("il","elle","lui","le", ...)
@@ -63,7 +63,7 @@ Here are a few facts that ought to be relevant for the training and evaluation a
 |             | Number of mentions | Number of covered mentions | Proportion of covered mentions | Number of uncorresponding mention limit due to tokenization |
 | :----------:|       :-:          |           :-:              |           :-:                  |                             :-:                             |
 | Train + Dev |       55921        |           40063            |           71.6 %               |                             59                              |
-| Test        |               |                       |                           |                                                           |
+| Test        |        2669        |           3834             |           69.6 %               |                              9                             |
 
 
 
