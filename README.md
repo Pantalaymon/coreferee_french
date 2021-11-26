@@ -13,6 +13,42 @@ The currently supported french models are :
 
 We plan to add support for the transformers-based spacy model in the future. Although fr_dep_news_trf produces considerably better sentence analysis than the other models, it does not come with a named entity recogniser, which is necessary to identify noun pairs (as well as a helpful features of the neural ensemble).
 
+## Using a french model
+
+To use a model you will need to first download one of the french spacy models mentioned above. The following example assumes you have installed the model 'fr_core_news_lg'.
+
+You will need to download coreferee and the french model. Coreferee is currently supported with python 3.9 :
+
+```
+python3 -m pip install coreferee
+python3 -m coreferee install fr
+```
+
+And in a python 3.9 prompt
+```
+>>> import coreferee, spacy
+>>> nlp = spacy.load('fr_core_news_lg')
+>>> nlp.add_pipe('coreferee')
+<coreferee.manager.CorefereeBroker object at 0x000001F556B4FF10>
+>>>
+>>> doc = nlp("Même si elle était très occupée par son travail, Julie en avait marre. Alors, elle et son mari décidèrent qu'ils avaient besoin de vacances. Ils allèrent en Espagne car ils adoraient le pays")
+>>>
+>>> doc._.coref_chains.print()
+0: elle(2), son(7), Julie(10), elle(17), son(19)
+1: travail(8), en(11)
+2: [elle(17); mari(20)], ils(23), Ils(29), ils(34)
+3: Espagne(32), pays(37)
+>>>
+>>> doc[17]._.coref_chains.print()
+0: elle(2), son(7), Julie(10), elle(17), son(19)
+2: [elle(17); mari(20)], ils(23), Ils(29), ils(34)
+>>>
+>>> doc._.coref_chains.resolve(doc[34])
+[Julie, mari]
+>>>
+```
+
+
 ## Road Map
 Done :
 - Designing Language specific rules to identify potential coreference
