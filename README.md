@@ -143,7 +143,7 @@ In the test corpus (not used at all during development) we obtain :
 
 ### BLANC
 
-We chose to use [https://aclanthology.org/P14-2005/](BLANC) as we find the details of the metric are precise enough to give a good idea of the strong points and weak points of the system. Unlike the previous metric that was computed on anaphoric pairs, this metric considers the whole coreference chains.
+We chose to use [BLANC](https://aclanthology.org/P14-2005/) as we find the details of the metric are precise enough to give a good idea of the strong points and weak points of the system. Unlike the previous metric that was computed on anaphoric pairs, this metric considers the whole coreference chains.
 
 On the test corpus we obtain :
 
