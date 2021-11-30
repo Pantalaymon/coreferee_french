@@ -11,7 +11,7 @@ The currently supported french models are :
 - fr_core_news_md
 - fr_core_news_lg
 
-We plan to add support for the transformers-based spacy model in the future. Although fr_dep_news_trf produces considerably better sentence analysis than the other models, it does not come with a named entity recogniser, which is necessary to identify noun pairs (as well as a helpful features of the neural ensemble).
+We plan to add support for the transformers-based spacy model in the future. Although fr_dep_news_trf produces considerably better sentence analysis than the other models, it does not come with neither a named entity recogniser, which is necessary to identify noun pairs, nor token vectors (both of which ared used as features of the neural ensemble).
 
 ## Using a french model
 
