@@ -60,6 +60,7 @@ Done :
 - Smoke tests
 
 Currently:
+- Ensuring grammatical compatibility between potential coreferring nouns
 - Working on evaluation of the models
 
 ## What is covered
