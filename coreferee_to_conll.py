@@ -186,7 +186,3 @@ if __name__ == '__main__':
     else:
         txt_file_contents = {"doc":open(INPUT_FILE,encoding="utf8").read()}
     write_conll(txt_file_contents, args.output_file, nlp, token_boundaries, args.add_singletons)
-    #python coreferee_to_conll.py --input_file ..\..\corpus\corpus_with_singletons\dev.french.v4_gold_conll  --spacy_model fr_core_news_lg --output_file ..\..\corpus\machine_generated_conll\dev_french_coreferee.conll
-    #python coreferee_to_conll.py --input_file ..\..\corpus\corpus_with_singletons\test.french.v4_gold_conll  --spacy_model fr_core_news_lg --output_file ..\..\corpus\machine_generated_conll\test_french_coreferee.conll --max_coreferring_noun_dist 5
-    #cd /mnt/d/Utilisateurs/souma/Documents/Projets_Perso/Coreference/coreferee/scripts/reference-coreference-scorers-master/reference-coreference-scorers-master
-    #perl scorer.pl all ../../../../corpus/corpus_with_singletons/dev.french.v4_gold_conll ../../../../corpus/machine_generated_conll/dev_french_coreferee.conll
