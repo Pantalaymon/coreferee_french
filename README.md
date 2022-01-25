@@ -123,7 +123,7 @@ You may either pass in a list of token heads to build_mention()
 >>> from build_mentions import build_mention, create_mentions
 >>> rules_analyzer = nlp.get_pipe("coreferee").annotator.rules_analyzer
 >>> doc = nlp("Les enfants de l'école primaire rentrent chez leurs parents")
->>> for chain in doc._.coref_chains:                en_indexes]
+>>> for chain in doc._.coref_chains:
 ...     for mention in chain:
 ...             heads = [doc[i] for i in mention.token_indexes]
 ...             mention_phrase = build_mention(heads, rules_analyzer)
@@ -160,10 +160,9 @@ Here are a few facts that ought to be relevant for the training and evaluation a
 
 As always with coreference resolution, the choice of the metrics to evaluate the performance of the system is a non obvious, and non trivial task.
 
-It is worth mentioning that in the metrics below, the key mentions considered are the mentions identifies by coreferee. Which means that it only covers the phrases mentions above but it is also not totally accurate (possibly because of a case ignored by the rules and more probably because it builds upon spacy's analysis of the sentences which itself is not totally accurate, especially in the smaller models).
-
 
 ### PairWise Anaphor Metrics
+It is worth mentioning that in the metric below, the key mentions considered are the mentions identifies by coreferee. Which means that it only covers the phrases mentions above but it is also not totally accurate (possibly because of a case ignored by the rules and more probably because it builds upon spacy's analysis of the sentences which itself is not totally accurate, especially in the smaller models).
 
 Knowing the working process of coreferee for anaphors (broadly):
 - rule-based system identify mentions
