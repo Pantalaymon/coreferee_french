@@ -17,7 +17,7 @@ We plan to add support for the transformers-based spacy model in the future. Alt
 
 To use a model you will need to first download one of the french spacy models mentioned above. The following example will use the model 'fr_core_news_lg'.
 
-Coreferee is currently supported with python 3.9. Using a virtual environment is recommanded :
+Coreferee is currently supported with python 3.9. Using a virtual environment is recommended :
 ```
 python3.9 -m venv coreferee-env
 source coreferee-env/bin/activate
@@ -31,7 +31,7 @@ python3 -m spacy download fr_core_news_lg
 python3 -m coreferee install fr
 ```
 
-And in a the python 3.9 prompt
+And in the python 3.9 prompt
 ```
 >>> import coreferee, spacy
 >>> nlp = spacy.load('fr_core_news_lg')
@@ -61,7 +61,7 @@ Coreferee uses both a rule-based system to identify the potential coreference ca
 Below we will present the specificities of the french model.
 For more details on how coreferee works, see the [repository of the library](https://github.com/msg-systems/coreferee).
 
-The potential candidates for coreference are divided in two categories , the inpendent nouns and anaphoras:
+The potential candidates for coreference are divided in two categories, independent nouns and anaphoras:
 
 - Independent nouns :
   - Proper Nouns : Person names, city names, organisation names ...
@@ -81,15 +81,15 @@ The potential candidates for coreference are divided in two categories , the inp
 
 Elements that are typically *not* covered but could potentially corefer in a text :
 - First and second persons : Elements that are deictically anchored ("Je", "nous", "tu", "toi", "me", "mon", "le tien", ...)
-- Pronoun "on" 
-- Relative pronouns : ("que", "dont","lesquels",...)
+- The Indefinite Pronoun "on" 
+- Relative pronouns : ("que", "dont", "lesquels",...)
 - Interrogative pronouns : ("quoi","qui",...)
 - 'neuter' demonstrative pronoun and its derivative : Generally Either deictic or refers to proposition, not noun phrase ("ça","cela","c","ce")
 - Dates : hours, days, years, or centuries... 
 
 ## More advanced operations
 ### Changing referential distance
-While out of the score of the original intended use of coreferee, it may be useful to adapt the range of coreference chains depending on the type of textual data that is processed. Beware that increasing the range will likely lead to reduce the precision of the model while reducing it will likely lead to reduce the recall.
+While out of the scope of the original intended use of coreferee, it may be useful to adapt the range of coreference chains depending on the type of textual data that is processed. Beware that increasing the range will likely lead to reduce the precision of the model while reducing it will likely lead to reduce the recall.
 You may want to increase or reduce the potential sentence distance between a noun/anaphora and an anaphora. By default this distance is 5 sentences.
 ```
 >>> nlp("Les enfants reviennent de l'école. Elle est au nord. Elle est sur une colline. Celle-ci est haute. Et verte aussi. Mais pas trop loin. Ils arrivent bientôt")._.coref_chains.print()
@@ -125,7 +125,7 @@ You may want to increase or reduce the potential sentence distance between two c
 As shown above, coreferee does not output the whole noun phrases of the mentions. It only outputs the heads of those phrases (including the coordinated heads when they are part of the mention).
 To retrieve the noun phrases of the mentions, you may use the functions in ```build_mentions.py``` in this repository. This file is not part of coreferee so you will need to import it separately.
 Keep in mind that those functions operate entirely based on spacy's parse tree, which means that when the tree is not accurate, the resulting mentions may be unsatisfactory.
-You may either pass in a list of token heads to build_mention() 
+You may pass in a list of token heads to build_mention() 
 ```
 >>> from build_mentions import build_mention, create_mentions
 >>> rules_analyzer = nlp.get_pipe("coreferee").annotator.rules_analyzer
