@@ -15,16 +15,23 @@ We plan to add support for the transformers-based spacy model in the future. Alt
 
 ## Using a french model
 
-To use a model you will need to first download one of the french spacy models mentioned above. The following example assumes you have installed the model 'fr_core_news_lg'.
+To use a model you will need to first download one of the french spacy models mentioned above. The following example will use the model 'fr_core_news_lg'.
 
-You will need to download coreferee and the french model. Coreferee is currently supported with python 3.9 :
+Coreferee is currently supported with python 3.9. Using a virtual environment is recommanded :
+```
+python3.9 -m venv coreferee-env
+source coreferee-env/bin/activate
+
+```
+You will need to download coreferee and the french models (both spacy and coreferee ones). 
 
 ```
 python3 -m pip install coreferee
+python3 -m spacy download fr_core_news_lg
 python3 -m coreferee install fr
 ```
 
-And in a python 3.9 prompt
+And in a the python 3.9 prompt
 ```
 >>> import coreferee, spacy
 >>> nlp = spacy.load('fr_core_news_lg')
