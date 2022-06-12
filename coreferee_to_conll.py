@@ -32,7 +32,7 @@ def parse_conll(file_name):
                 txt_file_contents[doc_id] = ''.join(tokens)
                 all_tokens_spans_list[doc_id] = (tokens_spans, sentence_break_spans)
             elif line != '\n':
-                columns = line.split(' '*10)
+                columns = line.split()
                 token = columns[3]
                 sep = ' '
                 if token in (".",",",")","'") or first_token or\
@@ -68,7 +68,7 @@ def make_conll(doc, add_singletons, doc_id = None, tokens_sentence_boundaries = 
         doc_part = re.search("part (\d+)", doc_id).group(1)
     else:
         doc_name , doc_part = "_", "_"
-    mentions = create_mentions(doc, rules_analyzer, add_singletons=add_singletons)
+    mentions = create_mentions(doc, nlp, add_singletons=add_singletons)
     lines = [doc_id]
     token_count = 0
     size_doc = len(tokens_boundaries)
@@ -176,7 +176,6 @@ if __name__ == '__main__':
         = args.max_anaphora_dist
     nlp.get_pipe('coreferee').annotator.rules_analyzer.maximum_coreferring_nouns_sentence_referential_distance\
         = args.max_coreferring_noun_dist
-    rules_analyzer = nlp.get_pipe('coreferee').annotator.rules_analyzer
     if INPUT_FILE.endswith("conll"):
         txt_file_contents, all_tokens_spans_list = parse_conll(INPUT_FILE)
         if args.keep_original_tokenisation == True:

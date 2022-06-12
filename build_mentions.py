@@ -1,16 +1,27 @@
+from spacy.language import Language
+from spacy.tokens import Span, Token, Doc
 
-
-def build_mention(heads, rules_analyzer, detached_dep = None):
+def build_mention(
+    heads : list[Token], 
+    nlp: Language, 
+    extra_detached_dep:list[str] = None
+    ) -> Span:
     '''Builds a mention span from the heads of a mention
     the mention is built using spacy's french parse tree
     detached_dep : list of dependencies of the head of the mention to exclude from the span
     '''
+    rules_analyzer = nlp.get_pipe("coreferee").annotator.rules_analyzer
+    if isinstance(heads, Token):
+        heads = [heads]
     doc = heads[0].doc
     mention_pos_before = ("PROPN","NOUN","ADJ","DET","NUM")
     mention_pos_after = ("PROPN","NOUN","ADJ","NUM", "PRON", "PART", "ADV", "VERB", "AUX")
-    if detached_dep is None:
-        detached_dep = ("appos","dislocated","advmod","obl:mod",
-        "obl:arg","obl:agent","obl","orphan","parataxis")
+    detached_dep = ["appos","dislocated","advmod","obl:mod",
+        "obl:arg","obl:agent","obl","orphan","parataxis"]
+    detached_dep = ["appos","dislocated","advmod","obl:mod",
+        "obl:arg","obl:agent","obl","orphan","parataxis"]
+    if extra_detached_dep is not None:
+        detached_dep.extend(extra_detached_dep)
     start = heads[0].left_edge.i
     end = heads[-1].right_edge.i
     siblings = rules_analyzer.get_dependent_siblings(heads[0])
@@ -65,7 +76,12 @@ def build_mention(heads, rules_analyzer, detached_dep = None):
             break
     return doc[start:end+1]
 
-def create_mentions(doc, rules_analyzer, add_singletons=False, add_coordinated_singletons=False):
+def create_mentions(
+    doc: Doc, 
+    nlp: Language, 
+    add_singletons: bool =False, 
+    add_coordinated_singletons: bool=False
+    ) -> dict[Span, int]:
     '''
     Return a dict with:
         key: all the mention phrases found in a document 
@@ -73,6 +89,8 @@ def create_mentions(doc, rules_analyzer, add_singletons=False, add_coordinated_s
     By default only  corefering mentions are included
     set add_singletons = True to include singleton mentions as well
     '''
+    rules_analyzer = nlp.get_pipe("coreferee").annotator.rules_analyzer
+
     def is_mention_head(token):
         return (rules_analyzer.is_independent_noun(token) or
         rules_analyzer.is_potential_anaphor(token))
@@ -81,7 +99,7 @@ def create_mentions(doc, rules_analyzer, add_singletons=False, add_coordinated_s
     for chain in doc._.coref_chains:
         for mention in chain:
             mention_heads = [doc[i] for i in mention.token_indexes]
-            mention_phrase = build_mention(mention_heads, rules_analyzer)
+            mention_phrase = build_mention(mention_heads, nlp)
             #print(mention_phrase, (mention_start, mention_end), chain.index)
             indexed_mentions[mention_phrase] = chain.index
     if add_singletons:
@@ -91,17 +109,25 @@ def create_mentions(doc, rules_analyzer, add_singletons=False, add_coordinated_s
             last_chain_index = 0
         for token in doc:
             if not is_mention_head(token): continue
-            mention_phrase = build_mention([token], rules_analyzer)
+            mention_phrase = build_mention([token], nlp)
             if mention_phrase not in indexed_mentions:
                 last_chain_index +=1
                 indexed_mentions[mention_phrase] = last_chain_index
             if not add_coordinated_singletons : continue
             siblings = rules_analyzer.get_dependent_siblings(token)
             if not siblings or not all(is_mention_head(s) for s in siblings):continue
-            mention_phrase = build_mention([token]+siblings, rules_analyzer)
+            mention_phrase = build_mention([token]+siblings, nlp)
             if mention_phrase not in indexed_mentions:
                 last_chain_index +=1
                 indexed_mentions[mention_phrase] = last_chain_index
 
     return indexed_mentions
             
+def make_new_chains(new_mentions):
+    new_chains = {}
+    for new_mention, chain_index in new_mentions.items():
+        if chain_index in new_chains:
+            new_chains[chain_index].append(new_mention)
+        else:
+            new_chains[chain_index] = [new_mention]
+    return new_chains
